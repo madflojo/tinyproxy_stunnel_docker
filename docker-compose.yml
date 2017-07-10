@@ -7,7 +7,6 @@ services:
     tinyproxy:  
       build:
         context: ./tinyproxy
-      network_mode: host
       volumes:
         - ./tinyproxy/tinyproxy.conf:/etc/tinyproxy/tinyproxy.conf
      
@@ -16,7 +15,8 @@ services:
     stunnel:  
       build:
         context: ./stunnel
-      network_mode: host
+      depends_on:
+        - tinyproxy
       volumes:
         - ./stunnel/stunnel.conf:/etc/stunnel/stunnel.conf
         - ./stunnel/certs/:/etc/ssl/mycerts/
@@ -24,7 +24,10 @@ services:
     stunnel-client:  
       build:
         context: ./stunnel-client
-      network_mode: host
+      ports:
+        - "127.0.0.1:8081:8081"
+      depends_on:
+        - stunnel
       volumes:
         - ./stunnel-client/stunnel.conf:/etc/stunnel/stunnel.conf
         - ./stunnel/certs:/etc/ssl/certs        
